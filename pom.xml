@@ -15,35 +15,39 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
-            <scope>provided</scope>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.3.3.v20150827</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.21</version>
-            <scope>provided</scope>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>9.3.3.v20150827</version>
         </dependency>
-        <!-- if you are using Jersey client specific features without the server side -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
+            <artifactId>jersey-server</artifactId>
             <version>2.21</version>
-            <scope>provided</scope>
         </dependency>
-        <!--connectors-->
+
         <dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-grizzly-connector</artifactId>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet-core</artifactId>
             <version>2.21</version>
         </dependency>
+
         <dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-jetty-connector</artifactId>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-jetty-http</artifactId>
             <version>2.21</version>
         </dependency>
+
+<!--
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            <version>2.7</version>
+        </dependency>-->
         <dependency>
             <groupId>net.hamendi</groupId>
             <artifactId>lifo-singly-linked-list</artifactId>
@@ -108,12 +112,8 @@
                 <configuration>
                     <httpConnector>
                         <!-- make jetty listen on 127.0.0.1 for better security -->
-                        <!--host>127.0.0.1</host-->
+                        <host>127.0.0.1</host>
                     </httpConnector>
-                    <scanIntervalSeconds>3</scanIntervalSeconds>
-                    <webAppConfig>
-                        <!-- defaultsDescriptor>src/test/resources/jetty-maven-plugin-webdefault.xml</defaultsDescriptor -->
-                    </webAppConfig>
                 </configuration>
             </plugin>
         </plugins>

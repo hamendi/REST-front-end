@@ -4,12 +4,13 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Root resource (exposed at "list" path)
  *
  * Put is meant to map to a specific uri and be idempotent, it will not be
- * therefore used, instead I will use the POST HTTP method!
+ * therefore used, instead I will use the POST HTTP method.
  *
  * //http:localhost:8080/restful-list-service/api/list
  *
@@ -25,53 +26,60 @@ public class ListResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("create") //http://localhost:8080/restful-list-service/api/list/create
     public Response createList() {
-        this.list = new LockLessLinkedListTailLIFO<>();
-        return Response.ok().entity(true).build();
+        if (this.list == null) {
+            this.list = new LockLessLinkedListTailLIFO<>();
+        }
+        //HTTP Status 200 - OK
+        return Response.ok(true, MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @GET //pop an element off the tail of the list, or CRUD's 'Read'
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("read") //http://localhost:8080/restful-list-service/api/list/read
     public Response readElement() {
-        if(this.list == null) {
+        if (this.list == null) {
+            //HTTP Status 404 - Not Found
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.ok().entity(this.list.pop()).build();
+        //HTTP Status 200 - OK
+        return Response.ok(this.list.pop(), MediaType.APPLICATION_JSON_TYPE).build();
     }
 
     @POST //push an element to the end of the list, or CRUD's 'Update'
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
-    @Path("update/{element}") //http://localhost:8080/restful-list-service/api/list/update/<element>
-    public BooleanResponse updateList(@PathParam("element") Object element) { /////cant be object in PathParam, either or
-//        if (element == null) {
-//            return Response.status(Response.Status.BAD_REQUEST).build();
-//        }
-        BooleanResponse response = new BooleanResponse();
-        response.setResult(this.list.push(element));
-        return response;
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("update") //http://localhost:8080/restful-list-service/api/list/update/
+    public Response updateList(Object dto) {
+        if (this.list == null || dto == null) {
+            //HTTP Status 400 - Bad Request
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        //HTTP Status 200 - OK
+        return Response.ok(this.list.push(dto), MediaType.APPLICATION_JSON_TYPE).build();
     }
-//
-//    @POST //insert an element after another element in the list, or another variation of CRUD's 'Update'
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Path("insert/{element}/after/{after}") //http://localhost:8080/restful-list-service/api/list/insert/<element>/after/<after>
-//    public Response updateListInsert(@PathParam("element") Object element, @PathParam("after") Object after) {
-//        if (element == null || after == null) {
-//            return Response.status(Response.Status.BAD_REQUEST).build();
-//        }
-//        return Response.ok().entity(list.insertAfter(element, after)).build();
-//    }
+
+    @POST //insert an element after another element in the list, or another variation of CRUD's 'Update'
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("insert") //http://localhost:8080/restful-list-service/api/list/insert/
+    public Response updateListInsert(List<Object> dto) {
+        if (this.list == null || dto == null || dto.size() != 2) {
+            //HTTP Status 400 - Bad Request
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        //HTTP Status 200 - OK
+        return Response.ok(list.insertAfter(dto.get(0), dto.get(1)), MediaType.APPLICATION_JSON_TYPE).build();
+    }
 
     @DELETE //delete the list, or CRUD's 'Delete'
     @Produces(MediaType.APPLICATION_JSON)
     @Path("delete") //http://localhost:8080/restful-list-service/api/list/delete
     public Response deleteList() {
-        this.list = null;
-        if(this.list == null) {
-            return Response.ok().entity(true).build();
+        if (this.list != null) {
+            this.list = null;
         }
-        return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+        //HTTP Status 200 - OK
+        return Response.ok(true, MediaType.APPLICATION_JSON_TYPE).build();
     }
 
 	@GET
